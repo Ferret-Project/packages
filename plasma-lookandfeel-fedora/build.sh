@@ -22,13 +22,14 @@ info "Installing dependencies..."
 dnf install -y rpm-build --setopt=install_weak_deps=False -q
 
 # =============================================================================
-# 2 — Get version from repos (subpackage of plasma-workspace, tracks with it)
+# 2 — Get version from repos (strip epoch if present)
 # =============================================================================
 info "Fetching plasma-lookandfeel-fedora version..."
 VERSION=$(dnf repoquery plasma-lookandfeel-fedora 2>/dev/null \
     | grep -v "^Updating\|^Repo\|^$" \
     | sort -V | tail -1 \
-    | sed 's/.*-\([0-9][^-]*\)-[^-]*\.[^.]*$/\1/')
+    | sed 's/.*-\([0-9][^-]*\)-[^-]*\.[^.]*$/\1/' \
+    | sed 's/^[0-9]*://')
 
 [[ -n "$VERSION" ]] || die "Could not determine plasma-lookandfeel-fedora version"
 ok "Version: $VERSION"
