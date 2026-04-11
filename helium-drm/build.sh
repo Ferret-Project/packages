@@ -15,14 +15,13 @@ trap 'rm -rf "$WORKDIR"' EXIT
 # =============================================================================
 info "Installing dependencies..."
 dnf install -y --setopt=install_weak_deps=False -q \
-    dnf-plugins-core dnf5-plugins python3 rpmrebuild
+    python3 dnf5-plugins rpmrebuild fedora-workstation-repositories
 
 info "Enabling imput/helium COPR..."
 dnf copr enable -y imput/helium -q
 
 info "Enabling Google Chrome repo..."
-dnf config-manager -q --add-repo \
-    https://dl.google.com/linux/chrome/rpm/stable/x86_64
+dnf config-manager setopt google-chrome.enabled=1
 
 info "Installing helium-bin..."
 dnf install -y -q helium-bin
