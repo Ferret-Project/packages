@@ -6,7 +6,10 @@ name: Build packages
 
 on:
   schedule:
-    - cron: "0 4 * * *"
+    - cron: "23 04 * * *"
+    - cron: "47 08 * * *"
+    - cron: "33 14 * * *"
+    - cron: "17 19 * * *"
   workflow_dispatch:
 
 jobs:
