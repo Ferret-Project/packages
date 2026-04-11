@@ -5,6 +5,12 @@
 name: Build packages
 
 on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENSE"
+  pull_request:
   schedule:
     - cron: "23 04 * * *"
     - cron: "47 08 * * *"
