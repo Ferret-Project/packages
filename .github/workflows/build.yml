@@ -94,12 +94,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RPM_FILE=$(ls rpms/*.rpm | head -1)
-          VERSION=$(rpm -qp --queryformat '%{VERSION}-%{RELEASE}' "$RPM_FILE")
+          VERSION=$(basename "$RPM_FILE" | sed 's/^[^-]*-//; s/\.x86_64\.rpm$//; s/\.noarch\.rpm$//')
 
           gh release create "${{ matrix.package }}" \
             --repo ${{ github.repository }} \
             --title "${{ matrix.package }}" \
             --latest=false \
             --notes "**version:** \`${VERSION}\`
-**built:** \`$(date -u '+%Y-%m-%d %H:%M UTC')\`" \
+            **built:** \`$(date -u '+%Y-%m-%d %H:%M UTC')\`" \
             rpms/*.rpm
