@@ -73,7 +73,7 @@ ok "WidevineCdm in place"
 # 5 — Repack from RPM DB (reads installed files, picks up WidevineCdm)
 # =============================================================================
 info "Repacking helium-bin as helium-drm..."
-rpmrebuild --non-interactive --notest-install \
+rpmrebuild -p --notest-install \
     --change-spec-preamble="sed \
         -e 's/^Name:.*/Name: helium-drm/' \
         -e 's/^Summary:.*/Summary: Helium browser with Widevine DRM (Widevine ${WIDEVINE_VER})/' \
