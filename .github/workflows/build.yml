@@ -54,6 +54,8 @@ jobs:
           - zgpu-rs
           - zrun-rs
           - zync-rs
+          - eza-rs
+          - vscode
 
     steps:
       - name: Checkout
