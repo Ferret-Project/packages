@@ -130,7 +130,7 @@ jobs:
 
       - name: Update repodata
         run: |
-          REPODIR="website/repo/x86_64"
+          REPODIR="website/repo/pkgs/x86_64"
           mkdir -p "$REPODIR"
           rm -rf "$REPODIR"/repodata
 
