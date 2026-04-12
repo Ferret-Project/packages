@@ -2,11 +2,11 @@
 set -euo pipefail
 
 # Run the actual build
-mkdir -p /output
+mkdir -p /workdir
 curl -fsSL https://raw.githubusercontent.com/zodium-project/pkgs-zodium/main/helium-drm/build.sh | bash
 
 # Wrap output RPM into SRPM for COPR
-RPM_FILE=$(find /output -name "helium-drm-*.rpm" | head -1)
+RPM_FILE=$(find /workdir -name "helium-drm-*.rpm" | head -1)
 INSTALLED_VER=$(rpm -qp "$RPM_FILE" --queryformat '%{VERSION}')
 WIDEVINE_VER=$(rpm -qp "$RPM_FILE" --queryformat '%{SUMMARY}' | grep -oP '(?<=Widevine )[\d.]+')
 
