@@ -86,7 +86,7 @@ rpmrebuild --notest-install \
 RPM_FILE=$(find ~/rpmbuild/RPMS -name "helium-drm-*.rpm" 2>/dev/null | head -1)
 [[ -f "$RPM_FILE" ]] || die "RPM not found after rpmrebuild"
 
-cp "$RPM_FILE" /workdir/
-ok "RPM ready: /workdir/$(basename "$RPM_FILE")"
+cp "$RPM_FILE" /output/
+ok "RPM ready: /output/$(basename "$RPM_FILE")"
 echo ""
-rpm -qp --info "/workdir/$(basename "$RPM_FILE")"
+rpm -qp --info "/output/$(basename "$RPM_FILE")"
