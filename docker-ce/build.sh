@@ -1,0 +1,45 @@
+#!/bin/bash
+# =============================================================================
+#  docker-ce/build.sh
+#  Adds Docker CE repo, downloads all docker RPMs.
+# =============================================================================
+set -euo pipefail
+
+info() { echo "[•] $*"; }
+ok()   { echo "[✓] $*"; }
+die()  { echo "[✗] $*" >&2; exit 1; }
+
+# 1 — Add Docker CE repo
+# =============================================================================
+info "Adding Docker CE repo..."
+dnf install -y dnf5-plugins --setopt=install_weak_deps=False -q
+dnf config-manager addrepo \
+    --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+dnf config-manager setopt docker-ce-stable.enabled=1
+dnf --refresh makecache -q
+ok "Docker CE repo added"
+
+# 2 — Download all Docker CE RPMs
+# =============================================================================
+DOCKER_PKGS=(
+    docker-ce
+    docker-ce-cli
+    containerd.io
+    docker-buildx-plugin
+    docker-compose-plugin
+)
+
+info "Downloading Docker CE packages..."
+for pkg in "${DOCKER_PKGS[@]}"; do
+    info "  Downloading ${pkg}..."
+    dnf download "${pkg}" \
+        --destdir /output \
+        --arch x86_64 \
+        -q
+done
+
+ok "RPMs ready:"
+ls -lh /output/*.rpm
+for rpm in /output/*.rpm; do
+    rpm -qp --info "$rpm"
+done
