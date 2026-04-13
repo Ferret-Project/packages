@@ -1,7 +1,6 @@
 #!/bin/bash
 # =============================================================================
 #  zgpu-rs/build.sh
-#  Builds zgpu as a static musl binary and packages into RPM.
 # =============================================================================
 set -euo pipefail
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 # =============================================================================
 #  zrun-rs/build.sh
-#  Builds zrun as a static musl binary and packages into RPM.
 # =============================================================================
 set -euo pipefail
 

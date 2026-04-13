@@ -1,7 +1,6 @@
 #!/bin/bash
 # =============================================================================
 #  zync-rs/build.sh
-#  Builds zync as a static musl binary and packages into RPM.
 # =============================================================================
 set -euo pipefail
 

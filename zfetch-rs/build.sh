@@ -1,7 +1,6 @@
 #!/bin/bash
 # =============================================================================
 #  zfetch-rs/build.sh
-#  Clones zfetch-rs, builds release binary, packages into RPM.
 # =============================================================================
 set -euo pipefail
 
