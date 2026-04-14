@@ -65,6 +65,8 @@ jobs:
           - eza-rs
           - vscode
           - virtio-win
+          - oversteer-udev
+          - ublue-os-udev-rules
 
     steps:
       - name: Checkout
