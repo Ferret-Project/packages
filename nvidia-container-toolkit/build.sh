@@ -46,6 +46,9 @@ find "$STAGING" -type f -exec chmod 644 {} \;
 
 ok "Staged $(find "$STAGING" -not -type d | wc -l) files"
 
+VERSION="1.0.0"
+info "Version: $VERSION"
+
 # 4 — Write spec
 # =============================================================================
 RPMBUILD="$WORKDIR/rpmbuild"
@@ -53,7 +56,7 @@ mkdir -p "$RPMBUILD"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 cat > "$RPMBUILD/SPECS/nvidia-container-services.spec" <<SPEC
 Name:           nvidia-container-services
-Version:        1.0.0
+Version:        ${VERSION}
 Release:        1%{?dist}
 Summary:        Systemd units for NVIDIA CDI container toolkit
 License:        MPL-2.0
@@ -61,7 +64,8 @@ BuildArch:      noarch
 URL:            https://github.com/zodium-project/pkgs-zodium
 
 Requires:       systemd
-Recommends:     nvidia-container-toolkit
+Requires:       nvidia-container-toolkit
+Requires:       nvidia-container-toolkit-selinux
 
 %description
 Systemd service units for NVIDIA Container Device Interface (CDI) support.
