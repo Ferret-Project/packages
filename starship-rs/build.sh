@@ -21,7 +21,7 @@ dnf copr enable -y atim/starship
 info "Downloading starship from COPR..."
 dnf download starship \
     --destdir /output \
-    --arch x86_64 \
+    --arch x86_64 --arch noarch \
     -q
 
 ok "RPM ready: $(ls /output/starship-*.rpm)"

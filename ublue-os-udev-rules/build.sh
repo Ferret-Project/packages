@@ -10,7 +10,7 @@ dnf install -y -q dnf5-plugins
 dnf copr enable -y ublue-os/packages -q
 
 info "Downloading ublue-os-udev-rules..."
-dnf download ublue-os-udev-rules --destdir /output -q
+dnf download --arch x86_64 --arch noarch ublue-os-udev-rules --destdir /output -q
 
 ok "RPM ready: $(ls /output/ublue-os-udev-rules-*.rpm)"
 rpm -qp --info /output/ublue-os-udev-rules-*.rpm

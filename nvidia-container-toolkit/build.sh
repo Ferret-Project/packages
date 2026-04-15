@@ -24,7 +24,8 @@ info "Enabling COPR: @ai-ml/nvidia-container-toolkit..."
 dnf copr enable -y @ai-ml/nvidia-container-toolkit
 
 info "Downloading nvidia-container-toolkit + selinux from COPR..."
-dnf download --destdir /output --arch x86_64 --arch noarch \
+dnf download --destdir /output \
+    --arch x86_64 --arch noarch \
     nvidia-container-toolkit \
     nvidia-container-toolkit-selinux
 

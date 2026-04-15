@@ -33,7 +33,7 @@ for pkg in "${DOCKER_PKGS[@]}"; do
     info "  Downloading ${pkg}..."
     dnf download "${pkg}" \
         --destdir /output \
-        --arch x86_64 \
+        --arch x86_64 --arch noarch \
         -q
 done
 

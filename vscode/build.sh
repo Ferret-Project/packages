@@ -28,7 +28,7 @@ ok "VS Code repo added"
 info "Downloading VS Code from Microsoft repo..."
 dnf download code \
     --destdir /output \
-    --arch x86_64 \
+    --arch x86_64 --arch noarch \
     -q
 ok "RPM ready: $(ls /output/code-*.rpm)"
 rpm -qp --info /output/code-*.rpm
