@@ -67,7 +67,7 @@ jobs:
           - virtio-win
           - oversteer-udev
           - ublue-os-udev-rules
-          - nvidia-container-services
+          - nvidia-container-toolkit
 
     steps:
       - name: Checkout
