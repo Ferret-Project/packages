@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-#  nvidia-container-services/build.sh
+#  nvidia-container-toolkit/build.sh
 # =============================================================================
 set -euo pipefail
 
@@ -16,12 +16,24 @@ die()  { echo "[✗] $*" >&2; exit 1; }
 # 1 — Install build dependencies
 # =============================================================================
 info "Installing dependencies..."
-dnf install -y rpm-build --setopt=install_weak_deps=False -q
+dnf install -y rpm-build dnf-plugins-core dnf5-plugins --setopt=install_weak_deps=False -q
 
-# 2 — Version
+# 2 — Download upstream RPMs from COPR
 # =============================================================================
-VERSION="1.0.0"
-info "Version: $VERSION"
+info "Enabling COPR: @ai-ml/nvidia-container-toolkit..."
+dnf copr enable -y @ai-ml/nvidia-container-toolkit
+
+info "Downloading nvidia-container-toolkit from COPR..."
+dnf download --destdir /output nvidia-container-toolkit
+[[ "$(ls /output/nvidia-container-toolkit-*.rpm 2>/dev/null | wc -l)" -gt 0 ]] \
+    || die "nvidia-container-toolkit RPM not downloaded"
+ok "Downloaded: $(ls /output/nvidia-container-toolkit-*.rpm | xargs -n1 basename)"
+
+info "Downloading nvidia-container-toolkit-selinux from COPR..."
+dnf download --destdir /output nvidia-container-toolkit-selinux
+[[ "$(ls /output/nvidia-container-toolkit-selinux-*.rpm 2>/dev/null | wc -l)" -gt 0 ]] \
+    || die "nvidia-container-toolkit-selinux RPM not downloaded"
+ok "Downloaded: $(ls /output/nvidia-container-toolkit-selinux-*.rpm | xargs -n1 basename)"
 
 # 3 — Stage assets
 # =============================================================================
@@ -41,7 +53,7 @@ mkdir -p "$RPMBUILD"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 cat > "$RPMBUILD/SPECS/nvidia-container-services.spec" <<SPEC
 Name:           nvidia-container-services
-Version:        ${VERSION}
+Version:        1.0.0
 Release:        1%{?dist}
 Summary:        Systemd units for NVIDIA CDI container toolkit
 License:        MPL-2.0
@@ -49,7 +61,7 @@ BuildArch:      noarch
 URL:            https://github.com/zodium-project/pkgs-zodium
 
 Requires:       systemd
-Recommends:       nvidia-container-toolkit
+Recommends:     nvidia-container-toolkit
 
 %description
 Systemd service units for NVIDIA Container Device Interface (CDI) support.
@@ -89,3 +101,9 @@ ok "RPM ready: /output/$(basename "$RPM_FILE")"
 
 rpm -qp --info "/output/$(basename "$RPM_FILE")"
 rpm -qp --list "/output/$(basename "$RPM_FILE")"
+
+# 6 — Summary
+# =============================================================================
+info "Final output:"
+ls -lh /output/*.rpm
+ok "All 3 RPMs ready in /output/"
