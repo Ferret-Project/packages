@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-#  eza-rs/build.sh
+#  gui-cli/build.sh
 # =============================================================================
 set -euo pipefail
 
@@ -8,19 +8,28 @@ info() { echo "[•] $*"; }
 ok()   { echo "[✓] $*"; }
 die()  { echo "[✗] $*" >&2; exit 1; }
 
-# 1 — Add Terra repo
+# 1 — Install dnf5-plugins & enable COPR
 # =============================================================================
+info "Installing dnf5-plugins..."
+dnf install -y dnf5-plugins --setopt=install_weak_deps=False -q
+
+info "Enabling COPR atim/starship..."
+dnf copr enable -y atim/starship
+dnf copr enable -y scottames/ghostty
+dnf copr enable -y ublue-os/packages
+
 info "Adding Terra repo..."
 dnf install -y --nogpgcheck \
     --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
     terra-release -q
 dnf reinstall -y terra-release -q
+dnf makecache --refresh
 ok "Terra repo added"
 
-# 2 — Download eza RPM
+# 2 — Download starship RPM
 # =============================================================================
-info "Downloading eza from Terra..."
-dnf download eza \
+info "Downloading starship from COPR..."
+dnf download starship bazaar ghostty eza \
     --destdir /output \
     --arch x86_64 --arch noarch \
     -q
@@ -32,6 +41,5 @@ for f in /output/eza-*:*.rpm; do
     mv "$f" "/output/$clean"
 done
 
-ok "RPM ready: $(ls /output/eza-*.rpm)"
-rpm -qp --info /output/eza-*.rpm
-rpm -qp --list /output/eza-*.rpm
+ok "RPM ready:"
+ls /output/*.rpm

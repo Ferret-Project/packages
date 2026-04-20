@@ -53,13 +53,12 @@ jobs:
       matrix:
         package:
           - helium-drm
-          - starship-rs
+          - gui-cli
           - docker-ce
           - zodium-settings
           - fedora-logos
           - plasma-lookandfeel-fedora
           - zutils-rs
-          - eza-rs
           - vscode
           - virtio-win
           - udev-rules
