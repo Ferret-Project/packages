@@ -61,6 +61,7 @@ jobs:
           - zutils-rs
           - vscode
           - virtio-win
+          - wm-noctalia
           - udev-rules
           - nvidia-container-toolkit
 
