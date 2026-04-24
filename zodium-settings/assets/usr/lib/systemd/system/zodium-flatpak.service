@@ -9,6 +9,11 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 ExecStart=/usr/bin/flatpak remote-modify --no-filter --enable flathub
+ExecStart=/usr/bin/flatpak override --system --filesystem=xdg-config/gtk-3.0:ro
+ExecStart=/usr/bin/flatpak override --system --filesystem=xdg-config/gtk-4.0:ro
+ExecStart=/usr/bin/flatpak override --system --filesystem=xdg-data/icons:ro
+ExecStart=/usr/bin/flatpak override --system --env=GTK_THEME=adw-gtk3-dark
+ExecStart=/usr/bin/flatpak override --system --unset-env=QT_QPA_PLATFORMTHEME
 ExecStartPost=/usr/bin/touch /var/lib/flatpak/.zodium-flatpak-added
 
 [Install]
