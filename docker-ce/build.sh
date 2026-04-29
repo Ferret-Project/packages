@@ -36,6 +36,13 @@ for pkg in "${DOCKER_PKGS[@]}"; do
         -q
 done
 
+for f in /output/*.rpm; do
+    [[ -f "$f" ]] || continue
+    base=$(basename "$f")
+    clean="${base//:/-}"
+    mv "$f" "/output/$clean"
+done
+
 ok "RPMs ready:"
 ls -lh /output/*.rpm
 for rpm in /output/*.rpm; do

@@ -87,6 +87,14 @@ RPM_FILE=$(find ~/rpmbuild/RPMS -name "helium-drm-*.rpm" 2>/dev/null | head -1)
 [[ -f "$RPM_FILE" ]] || die "RPM not found after rpmrebuild"
 
 cp "$RPM_FILE" /output/
+
+for f in /output/*.rpm; do
+    [[ -f "$f" ]] || continue
+    base=$(basename "$f")
+    clean="${base//:/-}"
+    mv "$f" "/output/$clean"
+done
+
 ok "RPM ready: /output/$(basename "$RPM_FILE")"
 echo ""
 rpm -qp --info "/output/$(basename "$RPM_FILE")"

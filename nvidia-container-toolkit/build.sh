@@ -110,5 +110,13 @@ rpm -qp --list "/output/$(basename "$RPM_FILE")"
 # 6 — Summary
 # =============================================================================
 info "Final output:"
+
+for f in /output/*.rpm; do
+    [[ -f "$f" ]] || continue
+    base=$(basename "$f")
+    clean="${base//:/-}"
+    mv "$f" "/output/$clean"
+done
+
 ls -lh /output/*.rpm
 ok "All 3 RPMs ready in /output/"

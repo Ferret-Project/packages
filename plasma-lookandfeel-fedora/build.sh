@@ -72,6 +72,13 @@ rpmbuild \
 RPM_FILE=$(find "$RPMBUILD/RPMS" -name "plasma-lookandfeel-fedora-*.rpm" | head -1)
 [[ -f "$RPM_FILE" ]] || die "RPM not found after build"
 
+for f in /output/*.rpm; do
+    [[ -f "$f" ]] || continue
+    base=$(basename "$f")
+    clean="${base//:/-}"
+    mv "$f" "/output/$clean"
+done
+
 cp "$RPM_FILE" /output/
 ok "RPM ready: /output/$(basename "$RPM_FILE")"
 

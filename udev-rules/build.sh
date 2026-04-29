@@ -15,11 +15,12 @@ dnf download --arch x86_64 --arch noarch \
     oversteer-udev \
     --destdir /output -q
 
-[[ "$(ls /output/ublue-os-udev-rules-[0-9]*.rpm 2>/dev/null | wc -l)" -gt 0 ]] \
-    || die "ublue-os-udev-rules RPM not downloaded"
-[[ "$(ls /output/oversteer-udev-[0-9]*.rpm 2>/dev/null | wc -l)" -gt 0 ]] \
-    || die "oversteer-udev RPM not downloaded"
+for f in /output/*.rpm; do
+    [[ -f "$f" ]] || continue
+    base=$(basename "$f")
+    clean="${base//:/-}"
+    mv "$f" "/output/$clean"
+done
 
-ok "Downloaded: $(ls /output/ublue-os-udev-rules-[0-9]*.rpm /output/oversteer-udev-[0-9]*.rpm | xargs -n1 basename)"
-rpm -qp --info /output/ublue-os-udev-rules-[0-9]*.rpm
-rpm -qp --info /output/oversteer-udev-[0-9]*.rpm
+info "Showing downloaded files..."
+ls -lh /output

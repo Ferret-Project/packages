@@ -119,6 +119,13 @@ build_package "zfetch" \
 multiple built-in themes, TUI configuration, and terminal resizing support." \
     false
 
+for f in /output/*.rpm; do
+    [[ -f "$f" ]] || continue
+    base=$(basename "$f")
+    clean="${base//:/-}"
+    mv "$f" "/output/$clean"
+done
+
 # 4 — Summary
 # =============================================================================
 info "Final output:"
