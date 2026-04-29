@@ -14,6 +14,7 @@ info "Installing dnf5-plugins..."
 dnf install -y dnf5-plugins --setopt=install_weak_deps=False -q
 
 info "Enabling COPRs..."
+dnf copr enable lilay/topgrade
 dnf copr enable -y atim/starship
 dnf copr enable -y scottames/ghostty
 dnf copr enable -y ublue-os/packages
@@ -29,7 +30,7 @@ ok "Terra repo added"
 # 2 — Download RPM
 # =============================================================================
 info "Downloading starship from COPR..."
-dnf download starship bazaar ghostty eza \
+dnf download starship bazaar ghostty eza topgrade \
     --destdir /output \
     --arch x86_64 --arch noarch \
     -q
