@@ -12,8 +12,7 @@ die()  { echo "[✗] $*" >&2; exit 1; }
 # =============================================================================
 info "Adding Docker CE repo..."
 dnf install -y dnf5-plugins --setopt=install_weak_deps=False -q
-dnf config-manager addrepo \
-    --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
 dnf config-manager setopt docker-ce-stable.enabled=1
 dnf --refresh makecache -q
 ok "Docker CE repo added"
