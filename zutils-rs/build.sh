@@ -119,12 +119,6 @@ build_package "zrun" \
 Compiled as a fully static musl binary with zero external runtime deps." \
     true
 
-build_package "zgpu" \
-    "GPU selection and PRIME offload launcher written in Rust" \
-    "zgpu is a prime-run alternative written in Rust, compiled as a fully static
-musl binary with no runtime dependencies. Works on all GPU vendors." \
-    true
-
 build_package "zfetch" \
     "A fast and good looking fetch tool written in Rust" \
     "zfetch is a fast, minimal system fetch tool written in Rust with
