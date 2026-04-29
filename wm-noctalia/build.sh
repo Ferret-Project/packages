@@ -139,22 +139,14 @@ License:        MIT
 URL:            https://github.com/noctalia-dev/noctalia-shell
 BuildArch:      x86_64
 
-Requires:       cairo
-Requires:       libcurl
-Requires:       fontconfig
-Requires:       freetype
-Requires:       libgcc
-Requires:       glib2
-Requires:       glibc
-Requires:       libglvnd
-Requires:       pipewire-libs
 Requires:       libwebp
-Requires:       libxkbcommon
-Requires:       pam
-Requires:       pango
-Requires:       polkit-libs
-Requires:       sdbus-cpp
-Requires:       wayland
+Requires:       hicolor-icon-theme
+
+Recommends:     cliphist
+Recommends:     ddcutil
+Recommends:     gpu-screen-recorder
+Recommends:     power-profiles-daemon
+Recommends:     wlsunset
 
 %description
 Lightweight Wayland shell built directly on Wayland and OpenGL ES.
