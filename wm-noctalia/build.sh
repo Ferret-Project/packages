@@ -81,9 +81,11 @@ ok "Build deps installed"
 # 4 — Clone noctalia v5 branch
 # =============================================================================
 info "Cloning noctalia v5 branch..."
-git clone --depth=1 --branch v5 \
+git clone --branch v5 \
     https://github.com/noctalia-dev/noctalia-shell.git \
     "$SRCDIR"
+# Pinned to last known good commit — upstream broke displayLabel() after this
+git -C "$SRCDIR" checkout 8fa8a148f373ebc47dd834fded8da0dd84ce6d5c
 
 # 5 — Detect version (mirrors the PKGBUILD pkgver() function exactly)
 # =============================================================================
