@@ -75,7 +75,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}/${{ matrix.package }}:/build/${{ matrix.package }}:ro" \
             -v "${{ github.workspace }}/output/${{ matrix.package }}:/output" \
-            fedora:44 \
+            fedora:43 \
             bash /build/${{ matrix.package }}/build.sh
 
       - name: Verify RPM
