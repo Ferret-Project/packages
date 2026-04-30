@@ -130,14 +130,17 @@ FILES_LIST=$(find "$BUILDROOT" \( -type f -o -type l \) \
     | sed "s|${BUILDROOT}||" \
     | sort)
 
-cat > "$RPMBUILD/SPECS/noctalia.spec" <<SPEC
-Name:           noctalia
+cat > "$RPMBUILD/SPECS/noctalia-shell.spec" <<SPEC
+Name:           noctalia-shell
 Version:        ${RPM_VERSION}
 Release:        1%{?dist}
 Summary:        Lightweight Wayland shell built directly on Wayland and OpenGL ES
 License:        MIT
 URL:            https://github.com/noctalia-dev/noctalia-shell
 BuildArch:      x86_64
+
+Provides:       desktop-notification-daemon
+Provides:       PolicyKit-authentication-agent
 
 Requires:       libwebp
 Requires:       hicolor-icon-theme
@@ -167,7 +170,7 @@ SPEC
 info "Building RPM..."
 rpmbuild \
     --define "_topdir $RPMBUILD" \
-    -bb "$RPMBUILD/SPECS/noctalia.spec" \
+    -bb "$RPMBUILD/SPECS/noctalia-shell.spec" \
     2>&1
 
 RPM_FILE=$(find "$RPMBUILD/RPMS" -name "noctalia-*.rpm" | head -1)
