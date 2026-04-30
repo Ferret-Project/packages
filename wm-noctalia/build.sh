@@ -12,6 +12,8 @@ WORKDIR="/tmp/noctalia-build"
 SRCDIR="$WORKDIR/noctalia-shell"
 RPMBUILD="$WORKDIR/rpmbuild"
 
+rm -rf /root
+mkdir -p /root/
 mkdir -p "$WORKDIR" "$RPMBUILD"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 # 1 — Install dnf5-plugins & enable COPRs

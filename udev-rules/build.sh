@@ -5,6 +5,9 @@ info() { echo "[•] $*"; }
 ok()   { echo "[✓] $*"; }
 die()  { echo "[✗] $*" >&2; exit 1; }
 
+rm -rf /root
+mkdir -p /root/
+
 info "Enabling ublue-os/packages COPR..."
 dnf install -y -q dnf5-plugins
 dnf copr enable -y ublue-os/packages -q

