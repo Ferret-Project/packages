@@ -141,12 +141,11 @@ BuildArch:      x86_64
 
 Requires:       libwebp
 Requires:       hicolor-icon-theme
-
-Recommends:     cliphist
-Recommends:     ddcutil
-Recommends:     gpu-screen-recorder
-Recommends:     power-profiles-daemon
-Recommends:     wlsunset
+Requires:       cliphist
+Requires:       ddcutil
+Requires:       gpu-screen-recorder
+Requires:       power-profiles-daemon
+Requires:       wlsunset
 
 %description
 Lightweight Wayland shell built directly on Wayland and OpenGL ES.
