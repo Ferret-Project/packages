@@ -169,7 +169,7 @@ jobs:
           TMPDIR=$(mktemp -d)
           cp all-rpms/*.rpm "$TMPDIR/"
           createrepo_c \
-            --baseurl "https://github.com/zodium-project/pkgs-zodium/releases/download/pkgs-rpm/" \
+            --baseurl "https://github.com/zodium-project/packages/releases/download/pkgs-rpm/" \
             "$TMPDIR"
 
           # Only copy repodata (no RPMs) into website repo
