@@ -36,7 +36,6 @@ cp -a "$SRCDIR/assets/." "$STAGING/"
 find "$STAGING" -type d  -exec chmod 755 {} \;
 find "$STAGING" -type f  -exec chmod 644 {} \;
 chmod 755 "$STAGING/usr/libexec/add_users_to_groups.sh" || true
-chmod 755 "$STAGING/usr/lib/zrun-scripts/"*.sh 2>/dev/null || true
 chmod 755 "$STAGING/usr/lib/systemd/system/"*.service 2>/dev/null || true
 
 ok "Staged $(find "$STAGING" -not -type d | wc -l) files"
@@ -44,7 +43,6 @@ ok "Staged $(find "$STAGING" -not -type d | wc -l) files"
 # 4 — Build %files list
 # =============================================================================
 UNIQUE_DIRS=(
-    /usr/lib/zrun-scripts
     /usr/share/plymouth/themes/zomac
     /usr/share/plymouth/themes/zomac/resources
 )
