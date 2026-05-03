@@ -29,6 +29,7 @@ GROUPS_TO_ADD=(
     docker      # docker access
     plugdev     # openrazer needs it
     libvirt     # kvm/libvirt needs it
+    falcond     # Falcond gamemode needs it
 )
 # ── UID range that defines a "human" user ─────────────────────
 UID_MIN=1000
