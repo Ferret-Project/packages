@@ -30,6 +30,7 @@ GROUPS_TO_ADD=(
     plugdev     # openrazer needs it
     libvirt     # kvm/libvirt needs it
     falcond     # Falcond gamemode needs it
+    i2c         # Needed for low latency prepherals
 )
 # ── UID range that defines a "human" user ─────────────────────
 UID_MIN=1000
