@@ -1,5 +1,5 @@
 # ================================================================
-#  pkgs-zodium — package build & release workflow
+#  packages — package build & release workflow
 # ================================================================
 
 name: Build packages

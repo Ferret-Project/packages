@@ -78,7 +78,7 @@ Release:        1%{?dist}
 Summary:        System settings and tweaks for Zodium
 License:        MPL-2
 BuildArch:      noarch
-URL:            https://github.com/zodium-project/pkgs-zodium
+URL:            https://github.com/zodium-project/packages
 
 Requires:       systemd
 Requires:       zram-generator
@@ -95,7 +95,7 @@ cp -a "${STAGING}/." "%{buildroot}/"
 %files
 ${FILES_SECTION}
 %changelog
-* $(date '+%a %b %d %Y') pkgs-zodium <actions@github.com> - ${VERSION}-1
+* $(date '+%a %b %d %Y') packages <actions@github.com> - ${VERSION}-1
 - Initial package
 SPEC
 

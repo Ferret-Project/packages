@@ -88,7 +88,7 @@ install -Dm755 "${BINARY}" %{buildroot}/usr/bin/${NAME}
 /usr/bin/${NAME}
 
 %changelog
-* $(date '+%a %b %d %Y') pkgs-zodium <actions@github.com> - ${VERSION}-1
+* $(date '+%a %b %d %Y') packages <actions@github.com> - ${VERSION}-1
 - Automated build
 SPEC
 

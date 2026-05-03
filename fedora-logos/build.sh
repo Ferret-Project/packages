@@ -63,7 +63,7 @@ Satisfies all dependencies without installing any Fedora branding files.
 # intentionally empty
 
 %changelog
-* $(date '+%a %b %d %Y') pkgs-zodium <actions@github.com> - ${VERSION}-1
+* $(date '+%a %b %d %Y') packages <actions@github.com> - ${VERSION}-1
 - Empty replacement for fedora-logos (no branding)
 SPEC
 

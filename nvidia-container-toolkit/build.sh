@@ -74,7 +74,7 @@ Release:        1%{?dist}
 Summary:        Systemd units for NVIDIA CDI container toolkit
 License:        MPL-2.0
 BuildArch:      noarch
-URL:            https://github.com/zodium-project/pkgs-zodium
+URL:            https://github.com/zodium-project/packages
 
 Requires:       systemd
 Requires:       nvidia-container-toolkit
@@ -98,7 +98,7 @@ fi
 /usr/lib/systemd/system/nvidia-cdi.service
 
 %changelog
-* $(date '+%a %b %d %Y') pkgs-zodium <actions@github.com> - ${VERSION}-1
+* $(date '+%a %b %d %Y') packages <actions@github.com> - ${VERSION}-1
 - Initial package
 SPEC
 
