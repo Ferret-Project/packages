@@ -84,6 +84,16 @@ jobs:
           [[ "$(ls output/${{ matrix.package }}/*.rpm 2>/dev/null | wc -l)" -gt 0 ]] \
             || { echo "No RPMs found"; exit 1; }
 
+      - name: Sanitize RPM filenames
+        run: |
+          for rpm in output/${{ matrix.package }}/*.rpm; do
+            clean="$(dirname "$rpm")/$(basename "$rpm" \
+              | sed 's/^[0-9]*://' \
+              | sed 's/-[0-9]*:/-/' \
+              | sed 's/\^/-/g')"
+            [[ "$rpm" != "$clean" ]] && mv "$rpm" "$clean" || true
+          done
+
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:

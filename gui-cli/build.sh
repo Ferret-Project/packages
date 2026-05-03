@@ -59,6 +59,7 @@ for f in /output/*.rpm; do
     [[ -f "$f" ]] || continue
     base=${f##*/}
     clean=${base//:/-}
+    clean=${clean//^/-}
     [[ "$base" != "$clean" ]] && mv -- "$f" "/output/$clean"
 done
 
