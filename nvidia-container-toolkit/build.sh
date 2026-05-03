@@ -26,9 +26,18 @@ dnf install -y rpm-build dnf-plugins-core dnf5-plugins --setopt=install_weak_dep
 info "Enabling COPR: @ai-ml/nvidia-container-toolkit..."
 dnf copr enable -y @ai-ml/nvidia-container-toolkit
 
+info "Adding Terra repo..."
+dnf install -y --nogpgcheck \
+    --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
+    terra-release -q
+dnf reinstall -y terra-release -q
+dnf makecache --refresh
+ok "Terra repo added"
+
 info "Downloading nvidia-container-toolkit + selinux from COPR..."
 dnf download --destdir /output \
     --arch x86_64 --arch noarch \
+    prime-run \
     nvidia-container-toolkit \
     nvidia-container-toolkit-selinux
 
