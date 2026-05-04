@@ -38,9 +38,16 @@ ok "Build dependencies installed"
 # =============================================================================
 info "Resolving latest versions..."
 
-# Helper: latest semver tag via GitHub API — no git credentials needed
+# GitHub API helper — authenticated via GITHUB_TOKEN (avoids 60 req/hr rate limit)
+GH_AUTH=()
+if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    GH_AUTH=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
+fi
+gh_api() { curl -sf "${GH_AUTH[@]}" "https://api.github.com/${1}"; }
+
+# Helper: latest semver tag via GitHub API
 latest_tag() {
-    curl -sf "https://api.github.com/repos/${1}/tags" \
+    gh_api "repos/${1}/tags" \
         | python3 -c "
 import sys, json, re
 tags = json.load(sys.stdin)
@@ -61,13 +68,11 @@ GUI_VERSION=$(latest_tag "PikaOS-Linux/falcond-gui")
 info "falcond-gui:      v${GUI_VERSION}"
 
 # falcond-profiles: snapshot, no tags — HEAD commit + date
-PROFILES_COMMIT=$(curl -sf \
-    "https://api.github.com/repos/PikaOS-Linux/falcond-profiles/commits/HEAD" \
+PROFILES_COMMIT=$(gh_api "repos/PikaOS-Linux/falcond-profiles/commits/HEAD" \
     | python3 -c "import sys, json; print(json.load(sys.stdin)['sha'])")
 [[ -n "$PROFILES_COMMIT" ]] || die "Could not resolve falcond-profiles commit"
 PROFILES_SHORT="${PROFILES_COMMIT:0:7}"
-PROFILES_DATE=$(curl -sf \
-    "https://api.github.com/repos/PikaOS-Linux/falcond-profiles/commits/${PROFILES_COMMIT}" \
+PROFILES_DATE=$(gh_api "repos/PikaOS-Linux/falcond-profiles/commits/${PROFILES_COMMIT}" \
     | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
