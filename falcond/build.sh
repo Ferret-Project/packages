@@ -71,6 +71,8 @@ info "Cloning falcond-profiles @ ${PROFILES_SHORT}..."
 git clone --quiet https://github.com/PikaOS-Linux/falcond-profiles.git \
     "$CLONEDIR/falcond-profiles"
 git -C "$CLONEDIR/falcond-profiles" checkout "$FALCOND_PROFILES_COMMIT"
+sed -i 's|otter_conf-1.0.0-d7vdxA1KAgBoH7Iep3g616vLN4mQqiYRKoBhnmTz4aNT|otter_conf-1.0.0-d7vdxA1KAgBS8QrVFX8BovYbXCkA0hoiX66IJQBQZ75w|g' \
+    "$CLONEDIR/falcond/falcond/build.zig.zon"
 ok "Sources cloned"
 
 # 3 — Write spec
