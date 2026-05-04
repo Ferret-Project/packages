@@ -135,7 +135,7 @@ All data lives under /etc/falcond/ — /usr is read-only on immutable images.
 
 cd %{clonedir}/falcond/falcond
 zig build --fetch
-DESTDIR="%{buildroot}" \
+export DESTDIR="%{buildroot}"
 zig build \
     -Doptimize=ReleaseFast \
     -Dcpu=x86_64_v3 \
