@@ -43,11 +43,24 @@ GH_AUTH=()
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
     GH_AUTH=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
 fi
-gh_api() { curl -sf "${GH_AUTH[@]}" "https://api.github.com/${1}"; }
+gh_api()     { curl -sf "${GH_AUTH[@]}" "https://api.github.com/${1}"; }
+gitea_api()  { curl -sf "https://git.pika-os.com/api/v1/${1}"; }
 
 # Helper: latest semver tag via GitHub API
 latest_tag() {
     gh_api "repos/${1}/tags" \
+        | python3 -c "
+import sys, json, re
+tags = json.load(sys.stdin)
+versions = [re.sub(r'^v', '', t['name']) for t in tags if re.match(r'^v?[0-9]+\.[0-9]+\.[0-9]+$', t['name'])]
+versions.sort(key=lambda v: list(map(int, v.split('.'))), reverse=True)
+print(versions[0] if versions else '')
+"
+}
+
+# Helper: latest semver tag via Gitea API
+latest_tag_gitea() {
+    gitea_api "repos/${1}/tags" \
         | python3 -c "
 import sys, json, re
 tags = json.load(sys.stdin)
@@ -62,8 +75,8 @@ FALCOND_VERSION=$(latest_tag "PikaOS-Linux/falcond")
 [[ -n "$FALCOND_VERSION" ]] || die "Could not resolve falcond version"
 info "falcond:          v${FALCOND_VERSION}"
 
-# falcond-gui: latest semver tag
-GUI_VERSION=$(latest_tag "PikaOS-Linux/falcond-gui")
+# falcond-gui: latest semver tag (hosted on Gitea, not GitHub)
+GUI_VERSION=$(latest_tag_gitea "custom-gui-packages/falcond-gui")
 [[ -n "$GUI_VERSION" ]] || die "Could not resolve falcond-gui version"
 info "falcond-gui:      v${GUI_VERSION}"
 
@@ -92,7 +105,7 @@ git clone --depth=1 --branch "v${FALCOND_VERSION}" \
 
 info "Cloning falcond-gui v${GUI_VERSION}..."
 git clone --depth=1 --branch "v${GUI_VERSION}" \
-    https://github.com/PikaOS-Linux/falcond-gui.git \
+    https://git.pika-os.com/custom-gui-packages/falcond-gui.git \
     "$RPMBUILD/BUILD/falcond-gui"
 
 info "Cloning falcond-profiles @ ${PROFILES_SHORT}..."
