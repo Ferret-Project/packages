@@ -144,7 +144,7 @@ zig build \
     -Dsystem-conf-path=%{system_conf_path} \
     --prefix /usr
 
-cd %{clonedir}/falcond-gui
+cd %{clonedir}/falcond-gui/falcond-gui
 cargo build --release
 
 %install
@@ -166,12 +166,12 @@ install -Dm644 %{clonedir}/falcond-profiles/usr/share/falcond/profiles/htpc/*.co
     -t %{buildroot}%{profiles_htpc_dir}/
 install -dm2775 %{buildroot}%{user_profiles_dir}
 
-install -Dm755 %{clonedir}/falcond-gui/target/release/falcond-gui \
+install -Dm755 %{clonedir}/falcond-gui/falcond-gui/target/release/falcond-gui \
     %{buildroot}%{_bindir}/falcond-gui
 desktop-file-install \
     --dir=%{buildroot}%{_datadir}/applications \
-    %{clonedir}/falcond-gui/res/falcond-gui.desktop
-install -Dm644 %{clonedir}/falcond-gui/res/falcond.png \
+    %{clonedir}/falcond-gui/falcond-gui/res/falcond-gui.desktop
+install -Dm644 %{clonedir}/falcond-gui/falcond-gui/res/falcond.png \
     -t %{buildroot}%{_datadir}/icons/hicolor/512x512/apps/
 
 %check
