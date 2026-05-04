@@ -15,6 +15,16 @@ mkdir -p /root/
 RPMBUILD="/root/rpmbuild"
 mkdir -p "$RPMBUILD"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 
+# 0 — Add Terra repos
+# =============================================================================
+info "Adding Terra repo..."
+dnf install -y --nogpgcheck \
+    --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
+    terra-release -q
+dnf reinstall -y terra-release -q
+dnf makecache --refresh
+ok "Terra repo added"
+
 # 1 — Install build dependencies
 # =============================================================================
 info "Installing build dependencies..."
