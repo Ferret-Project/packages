@@ -48,10 +48,10 @@ ok "Build dependencies installed"
 # 1 — Install Zig directly from ziglang.org
 # =============================================================================
 info "Installing Zig ${ZIG_VER}..."
-ZIG_TAR="zig-linux-x86_64-${ZIG_VER}.tar.xz"
+ZIG_TAR="zig-x86_64-linux-${ZIG_VER}.tar.xz"
 curl -fL "https://ziglang.org/download/${ZIG_VER}/${ZIG_TAR}" -o "/tmp/${ZIG_TAR}"
 tar -xf "/tmp/${ZIG_TAR}" -C /usr/local
-ln -sf "/usr/local/zig-linux-x86_64-${ZIG_VER}/zig" /usr/local/bin/zig
+ln -sf "/usr/local/zig-x86_64-linux-${ZIG_VER}/zig" /usr/local/bin/zig
 rm -f "/tmp/${ZIG_TAR}"
 ok "Zig $(zig version) installed"
 
