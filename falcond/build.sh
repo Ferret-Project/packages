@@ -170,12 +170,12 @@ install -Dm755 %{clonedir}/falcond-gui/falcond-gui/target/release/falcond-gui \
     %{buildroot}%{_bindir}/falcond-gui
 desktop-file-install \
     --dir=%{buildroot}%{_datadir}/applications \
-    %{clonedir}/falcond-gui/falcond-gui/res/falcond-gui.desktop
-install -Dm644 %{clonedir}/falcond-gui/falcond-gui/res/falcond.png \
+    %{clonedir}/falcond-gui/falcond-gui/res/com.pikaos.falcondgui.desktop
+install -Dm644 %{clonedir}/falcond-gui/falcond-gui/res/com.pikaos.falcondgui.png \
     -t %{buildroot}%{_datadir}/icons/hicolor/512x512/apps/
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/falcond-gui.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/com.pikaos.falcondgui.desktop
 
 %pre
 getent group 'falcond' >/dev/null || groupadd -f -r 'falcond' || :
@@ -211,8 +211,8 @@ systemd-sysusers %{_sysusersdir}/falcond.conf &>/dev/null || :
 %attr(2775, root, falcond) %dir %{user_profiles_dir}
 
 %{_bindir}/falcond-gui
-%{_datadir}/applications/falcond-gui.desktop
-%{_datadir}/icons/hicolor/512x512/apps/falcond.png
+%{_datadir}/applications/com.pikaos.falcondgui.desktop
+%{_datadir}/icons/hicolor/512x512/apps/com.pikaos.falcondgui.png
 
 %changelog
 * $(date '+%a %b %d %Y') zodium-project <actions@github.com> - ${FALCOND_VER}-1
