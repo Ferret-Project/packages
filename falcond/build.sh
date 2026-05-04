@@ -85,8 +85,7 @@ zig build \
     -Dcpu=x86_64_v3 \
     -Dprofiles-dir=/etc/falcond/profiles \
     -Duser-profiles-dir=/etc/falcond/profiles/user \
-    -Dsystem-conf-path=/etc/falcond/system.conf \
-    --prefix /usr
+    -Dsystem-conf-path=/etc/falcond/system.conf
 ok "falcond built"
 
 info "Building falcond-gui..."
