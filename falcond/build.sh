@@ -75,7 +75,26 @@ sed -i 's|otter_conf-1.0.0-d7vdxA1KAgBoH7Iep3g616vLN4mQqiYRKoBhnmTz4aNT|otter_co
     "$CLONEDIR/falcond/falcond/build.zig.zon"
 ok "Sources cloned"
 
-# 3 — Write spec
+# 3 — Build binaries
+# =============================================================================
+info "Building falcond..."
+cd "$CLONEDIR/falcond/falcond"
+zig build --fetch
+zig build \
+    -Doptimize=ReleaseFast \
+    -Dcpu=x86_64_v3 \
+    -Dprofiles-dir=/etc/falcond/profiles \
+    -Duser-profiles-dir=/etc/falcond/profiles/user \
+    -Dsystem-conf-path=/etc/falcond/system.conf \
+    --prefix /usr
+ok "falcond built"
+
+info "Building falcond-gui..."
+cd "$CLONEDIR/falcond-gui/falcond-gui"
+cargo build --release
+ok "falcond-gui built"
+
+# 4 — Write spec
 # =============================================================================
 info "Writing spec..."
 cat > "$RPMBUILD/SPECS/falcond.spec" <<SPEC
@@ -103,13 +122,7 @@ URL:            https://github.com/PikaOS-Linux/falcond
 BuildArch:      x86_64
 
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  cargo
-BuildRequires:  rust
-BuildRequires:  git
 BuildRequires:  desktop-file-utils
-BuildRequires:  gtk4-devel
-BuildRequires:  libadwaita-devel
-BuildRequires:  mold
 
 Requires:       dbus
 Requires:       sudo
@@ -133,21 +146,10 @@ All data lives under /etc/falcond/ — /usr is read-only on immutable images.
 %prep
 %build
 
-cd %{clonedir}/falcond/falcond
-zig build --fetch
-export DESTDIR="%{buildroot}"
-zig build \
-    -Doptimize=ReleaseFast \
-    -Dcpu=x86_64_v3 \
-    -Dprofiles-dir=%{profiles_dir} \
-    -Duser-profiles-dir=%{user_profiles_dir} \
-    -Dsystem-conf-path=%{system_conf_path} \
-    --prefix /usr
-
-cd %{clonedir}/falcond-gui/falcond-gui
-cargo build --release
-
 %install
+
+install -Dm755 %{clonedir}/falcond/falcond/zig-out/bin/falcond \
+    %{buildroot}%{_bindir}/falcond
 
 install -Dm644 %{clonedir}/falcond/falcond/debian/falcond.service \
     %{buildroot}%{_unitdir}/falcond.service
@@ -220,7 +222,7 @@ systemd-sysusers %{_sysusersdir}/falcond.conf &>/dev/null || :
 SPEC
 ok "Spec written"
 
-# 4 — Build RPM
+# 5 — Build RPM
 # =============================================================================
 info "Building RPM..."
 rpmbuild \
@@ -231,7 +233,7 @@ rpmbuild \
 RPM_FILE=$(find "$RPMBUILD/RPMS" -name "falcond-*.rpm" | head -1)
 [[ -f "$RPM_FILE" ]] || die "RPM not found after build"
 
-# 5 — Sanitise filename and copy to /output
+# 6 — Sanitise filename and copy to /output
 # =============================================================================
 cp "$RPM_FILE" /output/
 
