@@ -144,7 +144,6 @@ Requires(post): gtk-update-icon-cache
 Provides:       group(falcond)
 
 # ── absorbs the three separate upstream packages ─────────────────────────────
-Provides:       falcond-profiles = %{profiles_version}
 Provides:       falcond-gui      = %{gui_version}
 Conflicts:      falcond-profiles
 Conflicts:      falcond-gui
@@ -181,7 +180,7 @@ zig build \
 
 # ── falcond-gui (Rust) — mirrors terra falcond-gui.spec %build ───────────────
 cd %{_builddir}/falcond-gui
-cargo build --release --locked
+cargo build --release
 
 %install
 
