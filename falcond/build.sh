@@ -38,25 +38,32 @@ ok "Build dependencies installed"
 # =============================================================================
 info "Resolving latest versions..."
 
+# Helper: latest semver tag via GitHub API — no git credentials needed
+latest_tag() {
+    curl -sf "https://api.github.com/repos/${1}/tags" \
+        | python3 -c "
+import sys, json, re
+tags = json.load(sys.stdin)
+versions = [re.sub(r'^v', '', t['name']) for t in tags if re.match(r'^v?[0-9]+\.[0-9]+\.[0-9]+$', t['name'])]
+versions.sort(key=lambda v: list(map(int, v.split('.'))), reverse=True)
+print(versions[0] if versions else '')
+"
+}
+
 # falcond: latest semver tag
-FALCOND_VERSION=$(git ls-remote --tags --sort=-v:refname \
-    https://github.com/PikaOS-Linux/falcond.git \
-    | grep -oP 'refs/tags/v\K[0-9]+\.[0-9]+\.[0-9]+$' \
-    | head -1)
+FALCOND_VERSION=$(latest_tag "PikaOS-Linux/falcond")
 [[ -n "$FALCOND_VERSION" ]] || die "Could not resolve falcond version"
 info "falcond:          v${FALCOND_VERSION}"
 
 # falcond-gui: latest semver tag
-GUI_VERSION=$(git ls-remote --tags --sort=-v:refname \
-    https://github.com/PikaOS-Linux/falcond-gui.git \
-    | grep -oP 'refs/tags/v\K[0-9]+\.[0-9]+\.[0-9]+$' \
-    | head -1)
+GUI_VERSION=$(latest_tag "PikaOS-Linux/falcond-gui")
 [[ -n "$GUI_VERSION" ]] || die "Could not resolve falcond-gui version"
 info "falcond-gui:      v${GUI_VERSION}"
 
 # falcond-profiles: snapshot, no tags — HEAD commit + date
-PROFILES_COMMIT=$(git ls-remote https://github.com/PikaOS-Linux/falcond-profiles.git HEAD \
-    | awk '{print $1}')
+PROFILES_COMMIT=$(curl -sf \
+    "https://api.github.com/repos/PikaOS-Linux/falcond-profiles/commits/HEAD" \
+    | python3 -c "import sys, json; print(json.load(sys.stdin)['sha'])")
 [[ -n "$PROFILES_COMMIT" ]] || die "Could not resolve falcond-profiles commit"
 PROFILES_SHORT="${PROFILES_COMMIT:0:7}"
 PROFILES_DATE=$(curl -sf \
