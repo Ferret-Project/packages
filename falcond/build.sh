@@ -15,15 +15,26 @@ mkdir -p /root/
 RPMBUILD="/root/rpmbuild"
 mkdir -p "$RPMBUILD"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 
-# 0 — Add Terra repos
+# 0 — Add Terra repo (priority=90, refresh)
 # =============================================================================
 info "Adding Terra repo..."
-dnf install -y --nogpgcheck \
+dnf install -y --nogpgcheck -q \
     --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' \
-    terra-release -q
-dnf reinstall -y terra-release -q
-dnf makecache --refresh
-ok "Terra repo added"
+    terra-release
+dnf reinstall -y -q terra-release
+# Set priority=90 on every section in terra.repo so it sits below Fedora
+# (default 99) but above most other third-party repos
+python3 - <<'PY'
+import configparser
+p = configparser.ConfigParser()
+p.read('/etc/yum.repos.d/terra.repo')
+for s in p.sections():
+    p.set(s, 'priority', '90')
+with open('/etc/yum.repos.d/terra.repo', 'w') as f:
+    p.write(f)
+PY
+dnf makecache --refresh -q
+ok "Terra repo added (priority=90)"
 
 # 1 — Install build dependencies
 # =============================================================================
@@ -53,8 +64,8 @@ GH_AUTH=()
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
     GH_AUTH=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
 fi
-gh_api()     { curl -sf "${GH_AUTH[@]}" "https://api.github.com/${1}"; }
-gitea_api()  { curl -sf "https://git.pika-os.com/api/v1/${1}"; }
+gh_api()    { curl -sf "${GH_AUTH[@]}" "https://api.github.com/${1}"; }
+gitea_api() { curl -sf "https://git.pika-os.com/api/v1/${1}"; }
 
 # Helper: latest semver tag via GitHub API
 latest_tag() {
@@ -131,13 +142,20 @@ info "Writing spec..."
 cat > "$RPMBUILD/SPECS/falcond.spec" <<SPEC
 %global _include_minidebuginfo 0
 
-# ── component versions (falcond,falcond-gui,falcond-profiles) ────────────────
+# ── component versions ────────────────────────────────────────────────────────
 %global falcond_version   ${FALCOND_VERSION}
 %global gui_version       ${GUI_VERSION}
 %global profiles_version  ${PROFILES_VERSION}
 
-# ── atomic adjustment: /usr is read-only on immutable images ─────────────────
-%global user_profiles_dir /etc/falcond/profiles/user
+# ── all falcond data lives under /etc on atomic/bootc images ─────────────────
+#    /usr is read-only; /etc is mutable and survives rpm-ostree upgrades.
+#    %config(noreplace) protects user edits on package updates.
+%global falcond_etc_dir       /etc/falcond
+%global profiles_dir          %{falcond_etc_dir}/profiles
+%global profiles_handheld_dir %{profiles_dir}/handheld
+%global profiles_htpc_dir     %{profiles_dir}/htpc
+%global user_profiles_dir     %{profiles_dir}/user
+%global system_conf_path      %{falcond_etc_dir}/system.conf
 
 Name:           falcond
 Version:        %{falcond_version}
@@ -148,7 +166,7 @@ URL:            https://github.com/PikaOS-Linux/falcond
 BuildArch:      x86_64
 
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  zig >= 0.16.0
+BuildRequires:  zig
 BuildRequires:  cargo
 BuildRequires:  rust
 BuildRequires:  git
@@ -157,21 +175,21 @@ BuildRequires:  gtk4-devel
 BuildRequires:  libadwaita-devel
 BuildRequires:  mold
 
-# ── runtime: daemon ──────────────────────────────────────────────────────────
+# ── runtime: daemon ───────────────────────────────────────────────────────────
 Requires:       dbus
 Requires:       sudo
 Requires:       (scx-scheds or scx-scheds-nightly)
 Requires:       (power-profiles-daemon or tuned-ppd)
 
-# ── runtime: GUI ─────────────────────────────────────────────────────────────
+# ── runtime: GUI ──────────────────────────────────────────────────────────────
 Requires:       gtk4
 Requires:       libadwaita
 Requires(post): gtk-update-icon-cache
 
-# ── group ────────────────────────────────────────────────────────────────────
+# ── group ─────────────────────────────────────────────────────────────────────
 Provides:       group(falcond)
 
-# ── absorbs the three separate upstream packages ─────────────────────────────
+# ── absorbs the three separate upstream packages ──────────────────────────────
 Provides:       falcond-gui      = %{gui_version}
 Conflicts:      falcond-profiles
 Conflicts:      falcond-gui
@@ -185,58 +203,68 @@ Combines:
   falcond-profiles %{profiles_version}  — default game profiles
   falcond-gui %{gui_version}            — control GUI
 
-Atomic adjustment: user profiles live in %{user_profiles_dir}
-(owned root:falcond, mode 2775) instead of the upstream default under
-/usr/share, because /usr is read-only on immutable images. The daemon
-is compiled with -Duser-profiles-dir=%{user_profiles_dir} so the path
-is baked in at build time — the GUI group-writable check passes cleanly.
+All profile data lives under /etc/falcond/ instead of /usr/share/falcond/
+because /usr is read-only on immutable images. The daemon is compiled with
+all path flags redirected to /etc at build time. Default profiles are marked
+%%config(noreplace) so user edits survive package upgrades.
+
+  /etc/falcond/config.conf          — main daemon config
+  /etc/falcond/system.conf          — system processes list
+  /etc/falcond/profiles/*.conf      — default profiles
+  /etc/falcond/profiles/handheld/   — handheld variant profiles
+  /etc/falcond/profiles/htpc/       — HTPC variant profiles
+  /etc/falcond/profiles/user/       — user override profiles (group-writable)
 
 %prep
 # Sources already cloned into BUILD/ by build.sh — nothing to unpack.
 
 %build
 
-# ── falcond daemon (Zig) — mirrors terra's falcond.spec %install ────────────
+# ── falcond daemon (Zig) ──────────────────────────────────────────────────────
+# All path flags redirected to /etc so the binary has them baked in at
+# compile time. profilesDirForMode() appends /handheld or /htpc to
+# profiles-dir automatically at runtime based on profile_mode in config.
 cd %{_builddir}/falcond/falcond
 zig build --fetch
 DESTDIR="%{buildroot}" \
 zig build \
     -Doptimize=ReleaseFast \
     -Dcpu=x86_64_v3 \
+    -Dprofiles-dir=%{profiles_dir} \
     -Duser-profiles-dir=%{user_profiles_dir} \
+    -Dsystem-conf-path=%{system_conf_path} \
     --prefix /usr
 
-# ── falcond-gui (Rust) — mirrors terra falcond-gui.spec %build ───────────────
+# ── falcond-gui (Rust) ────────────────────────────────────────────────────────
 cd %{_builddir}/falcond-gui
 cargo build --release
 
 %install
 
-# ── daemon binary + service (mirrors terra falcond.spec %install) ────────────
-# zig build --prefix /usr with DESTDIR already put the binary in buildroot;
-# we only need to add the service file manually (same as terra does)
+# ── daemon binary (zig build --prefix /usr + DESTDIR already placed it) ───────
 install -Dm644 %{_builddir}/falcond/falcond/debian/falcond.service \
     %{buildroot}%{_unitdir}/falcond.service
 
-# ── sysusers.d — declarative group for atomic (added for bootc) ──────────────
+# ── sysusers.d — declarative group for atomic images ─────────────────────────
 install -Dm644 /dev/stdin %{buildroot}%{_sysusersdir}/falcond.conf <<'EOF'
-# falcond group — gates write access to %{user_profiles_dir}
+# falcond group — gates write access to /etc/falcond/profiles/user
 g falcond - -
 EOF
 
-# ── profiles (mirrors terra falcond-profiles.spec %install) ──────────────────
+# ── profiles: source is usr/share/... in the repo; destination is /etc ────────
 install -Dm644 %{_builddir}/falcond-profiles/usr/share/falcond/system.conf \
-    -t %{buildroot}%{_datadir}/falcond/
+    %{buildroot}%{system_conf_path}
 install -Dm644 %{_builddir}/falcond-profiles/usr/share/falcond/profiles/*.conf \
-    -t %{buildroot}%{_datadir}/falcond/profiles/
+    -t %{buildroot}%{profiles_dir}/
 install -Dm644 %{_builddir}/falcond-profiles/usr/share/falcond/profiles/handheld/*.conf \
-    -t %{buildroot}%{_datadir}/falcond/profiles/handheld/
+    -t %{buildroot}%{profiles_handheld_dir}/
 install -Dm644 %{_builddir}/falcond-profiles/usr/share/falcond/profiles/htpc/*.conf \
-    -t %{buildroot}%{_datadir}/falcond/profiles/htpc/
-# User profiles dir → /etc (mirrors terra's install -dm2775 but redirected to /etc)
+    -t %{buildroot}%{profiles_htpc_dir}/
+
+# user profiles dir — setgid falcond so new files inherit the group
 install -dm2775 %{buildroot}%{user_profiles_dir}
 
-# ── GUI (mirrors terra falcond-gui.spec %install) ───────────────────────────
+# ── GUI ───────────────────────────────────────────────────────────────────────
 install -Dm755 %{_builddir}/falcond-gui/target/release/falcond-gui \
     %{buildroot}%{_bindir}/falcond-gui
 desktop-file-install \
@@ -248,17 +276,14 @@ install -Dm644 %{_builddir}/falcond-gui/res/falcond.png \
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/falcond-gui.desktop
 
-# ── scriptlets (mirrors terra falcond.spec scriptlets) ──────────────────────
+# ── scriptlets ────────────────────────────────────────────────────────────────
 
 %pre
-# Create falcond group if it doesn't exist
 getent group 'falcond' >/dev/null || groupadd -f -r 'falcond' || :
-# Root must be a member of the group
 usermod -aG 'falcond' root || :
 
 %post
 %systemd_post falcond.service
-# Register group via sysusers.d (needed on atomic images)
 systemd-sysusers %{_sysusersdir}/falcond.conf &>/dev/null || :
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor/ &>/dev/null || :
 
@@ -272,21 +297,29 @@ systemd-sysusers %{_sysusersdir}/falcond.conf &>/dev/null || :
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor/ &>/dev/null || :
 
 %files
-# ── daemon (mirrors terra falcond.spec %files) ────────────────────────────────
+# ── daemon ────────────────────────────────────────────────────────────────────
 %{_bindir}/falcond
 %{_unitdir}/falcond.service
 %{_sysusersdir}/falcond.conf
 
-# ── profiles (mirrors terra falcond-profiles.spec %files) ────────────────────
-%dir %{_datadir}/falcond
-%{_datadir}/falcond/system.conf
-%{_datadir}/falcond/profiles/*.conf
-%{_datadir}/falcond/profiles/handheld/*.conf
-%{_datadir}/falcond/profiles/htpc/*.conf
-# /etc so it survives atomic image updates; 2775 = setgid falcond group
+# ── /etc/falcond tree ─────────────────────────────────────────────────────────
+# Directories owned by the package (not config — RPM manages them)
+%dir %{falcond_etc_dir}
+%dir %{profiles_dir}
+%dir %{profiles_handheld_dir}
+%dir %{profiles_htpc_dir}
+
+# system.conf and all default profiles: config(noreplace) so user edits
+# survive rpm-ostree upgrades (new upstream version lands as *.rpmnew)
+%config(noreplace) %{system_conf_path}
+%config(noreplace) %{profiles_dir}/*.conf
+%config(noreplace) %{profiles_handheld_dir}/*.conf
+%config(noreplace) %{profiles_htpc_dir}/*.conf
+
+# user profiles dir — setgid falcond, writable by falcond group members
 %attr(2775, root, falcond) %dir %{user_profiles_dir}
 
-# ── GUI (mirrors terra falcond-gui.spec %files) ───────────────────────────────
+# ── GUI ───────────────────────────────────────────────────────────────────────
 %{_bindir}/falcond-gui
 %{_datadir}/applications/falcond-gui.desktop
 %{_datadir}/icons/hicolor/512x512/apps/falcond.png
@@ -294,7 +327,10 @@ systemd-sysusers %{_sysusersdir}/falcond.conf &>/dev/null || :
 %changelog
 * $(date '+%a %b %d %Y') zodium-project <actions@github.com> - ${FALCOND_VERSION}-1
 - Unified falcond + falcond-profiles + falcond-gui for Zodium (atomic/bootc)
-- Redirect user-profiles-dir to /etc/falcond/profiles/user (immutable /usr)
+- Redirect ALL paths to /etc/falcond/ (profiles, handheld, htpc, user, system.conf)
+- Compile daemon with -Dprofiles-dir, -Duser-profiles-dir, -Dsystem-conf-path baked in
+- Default profiles marked %%config(noreplace) so user edits survive upgrades
+- Drop /usr/share/falcond entirely; nothing goes to /usr on atomic images
 - Add sysusers.d group declaration for systemd-managed atomic images
 SPEC
 
