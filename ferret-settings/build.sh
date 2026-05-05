@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
-#  minkos-settings/build.sh
+#  ferret-settings/build.sh
 # =============================================================================
 set -euo pipefail
 
-SRCDIR="/build/minkos-settings"
-WORKDIR="/tmp/minkos-settings-build"
+SRCDIR="/build/ferret-settings"
+WORKDIR="/tmp/ferret-settings-build"
 mkdir -p "$WORKDIR"
 cd "$WORKDIR"
 
@@ -69,8 +69,8 @@ while IFS= read -r f; do
     fi
 done < <(find "$STAGING" -not -type d | sed "s|$STAGING||" | sort)
 
-cat > "$RPMBUILD/SPECS/minkos-settings.spec" <<SPEC
-Name:           minkos-settings
+cat > "$RPMBUILD/SPECS/ferret-settings.spec" <<SPEC
+Name:           ferret-settings
 Version:        ${VERSION}
 Release:        1%{?dist}
 Summary:        System settings and tweaks for Ferret
@@ -103,10 +103,10 @@ SPEC
 info "Building RPM..."
 rpmbuild \
     --define "_topdir $RPMBUILD" \
-    -bb "$RPMBUILD/SPECS/minkos-settings.spec" \
+    -bb "$RPMBUILD/SPECS/ferret-settings.spec" \
     2>&1
 
-RPM_FILE=$(find "$RPMBUILD/RPMS" -name "minkos-settings-*.rpm" | head -1)
+RPM_FILE=$(find "$RPMBUILD/RPMS" -name "ferret-settings-*.rpm" | head -1)
 [[ -f "$RPM_FILE" ]] || die "RPM not found after build"
 
 for f in /output/*.rpm; do
