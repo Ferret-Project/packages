@@ -1,6 +1,6 @@
 [Unit]
 Description=Add Flatpak Repos
-ConditionPathExists=!/var/lib/flatpak/.zodium-flatpak-added
+ConditionPathExists=!/var/lib/flatpak/.flatpak-repos-added
 After=network-online.target
 Wants=network-online.target
 
@@ -12,7 +12,7 @@ ExecStart=/usr/bin/flatpak remote-modify --no-filter --enable flathub
 ExecStart=/usr/bin/flatpak override --system --filesystem=xdg-config/gtk-3.0:ro
 ExecStart=/usr/bin/flatpak override --system --filesystem=xdg-config/gtk-4.0:ro
 ExecStart=/usr/bin/flatpak override --system --filesystem=xdg-data/icons:ro
-ExecStartPost=/usr/bin/touch /var/lib/flatpak/.zodium-flatpak-added
+ExecStartPost=/usr/bin/touch /var/lib/flatpak/.flatpak-repos-added
 
 [Install]
 WantedBy=graphical.target

@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
-#  zodium-settings/build.sh
+#  minkos-settings/build.sh
 # =============================================================================
 set -euo pipefail
 
-SRCDIR="/build/zodium-settings"
-WORKDIR="/tmp/zodium-settings-build"
+SRCDIR="/build/minkos-settings"
+WORKDIR="/tmp/minkos-settings-build"
 mkdir -p "$WORKDIR"
 cd "$WORKDIR"
 
@@ -69,20 +69,20 @@ while IFS= read -r f; do
     fi
 done < <(find "$STAGING" -not -type d | sed "s|$STAGING||" | sort)
 
-cat > "$RPMBUILD/SPECS/zodium-settings.spec" <<SPEC
-Name:           zodium-settings
+cat > "$RPMBUILD/SPECS/minkos-settings.spec" <<SPEC
+Name:           minkos-settings
 Version:        ${VERSION}
 Release:        1%{?dist}
-Summary:        System settings and tweaks for Zodium
+Summary:        System settings and tweaks for Ferret
 License:        MPL-2
 BuildArch:      noarch
-URL:            https://github.com/zodium-project/packages
+URL:            https://github.com/ferret-project/packages
 
 Requires:       systemd
 Requires:       zram-generator
 
 %description
-System configuration files for Zodium:
+System configuration files for Ferret:
 - sysctl & systemd tweaks
 - zram generator config
 - user group management service
@@ -103,10 +103,10 @@ SPEC
 info "Building RPM..."
 rpmbuild \
     --define "_topdir $RPMBUILD" \
-    -bb "$RPMBUILD/SPECS/zodium-settings.spec" \
+    -bb "$RPMBUILD/SPECS/minkos-settings.spec" \
     2>&1
 
-RPM_FILE=$(find "$RPMBUILD/RPMS" -name "zodium-settings-*.rpm" | head -1)
+RPM_FILE=$(find "$RPMBUILD/RPMS" -name "minkos-settings-*.rpm" | head -1)
 [[ -f "$RPM_FILE" ]] || die "RPM not found after build"
 
 for f in /output/*.rpm; do

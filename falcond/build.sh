@@ -216,7 +216,7 @@ systemd-sysusers %{_sysusersdir}/falcond.conf &>/dev/null || :
 %{_datadir}/icons/hicolor/512x512/apps/com.pikaos.falcondgui.png
 
 %changelog
-* $(date '+%a %b %d %Y') zodium-project <actions@github.com> - ${FALCOND_VER}-1
+* $(date '+%a %b %d %Y') ferret-project <actions@github.com> - ${FALCOND_VER}-1
 - Unified falcond + falcond-profiles + falcond-gui for Zodium (atomic/bootc)
 SPEC
 ok "Spec written"

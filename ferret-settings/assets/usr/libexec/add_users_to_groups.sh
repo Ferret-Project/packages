@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ================================================================
 #  Groups — append all human users to system groups
-#  Zodium Project : github.com/zodium-project
+#  Ferret Project : github.com/ferret-project
 # ================================================================
 # ── Exit immediately if a command exits with a non-zero status ── #
 set -euo pipefail

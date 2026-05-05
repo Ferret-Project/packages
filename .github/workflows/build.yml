@@ -55,7 +55,7 @@ jobs:
           - helium-drm
           - gui-cli
           - docker-ce
-          - zodium-settings
+          - ferret-settings
           - fedora-logos
           - plasma-lookandfeel-fedora
           - zutils-rs
@@ -159,7 +159,7 @@ jobs:
       - name: Checkout website repo
         uses: actions/checkout@v6
         with:
-          repository: zodium-project/zodium-project.github.io
+          repository: ferret-project/ferret-project.github.io
           token: ${{ secrets.REPO_PAT }}
           path: website
 
@@ -183,7 +183,7 @@ jobs:
           TMPDIR=$(mktemp -d)
           cp all-rpms/*.rpm "$TMPDIR/"
           createrepo_c \
-            --baseurl "https://github.com/zodium-project/packages/releases/download/pkgs-rpm/" \
+            --baseurl "https://github.com/ferret-project/packages/releases/download/pkgs-rpm/" \
             "$TMPDIR"
 
           # Only copy repodata (no RPMs) into website repo

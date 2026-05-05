@@ -1,4 +1,4 @@
-# /usr/lib/systemd/system/zodium-groups.service
+# /usr/lib/systemd/system/ferret-groups.service
 [Unit]
 Description=Append human users to system groups
 After=local-fs.target systemd-sysusers.service

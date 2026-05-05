@@ -74,7 +74,7 @@ Release:        1%{?dist}
 Summary:        Systemd units for NVIDIA CDI container toolkit
 License:        MPL-2.0
 BuildArch:      noarch
-URL:            https://github.com/zodium-project/packages
+URL:            https://github.com/ferret-project/packages
 
 Requires:       systemd
 Requires:       nvidia-container-toolkit
